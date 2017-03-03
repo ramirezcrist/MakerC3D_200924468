@@ -57,12 +57,16 @@ ENTER   = [\ \n]
 <YYINITIAL> {PAR_IZQ}	    { return new Symbol(sym.PAR_IZQ, yyline, yycolumn, null); }
 <YYINITIAL> {PAR_DER}	    { return new Symbol(sym.PAR_DER, yyline, yycolumn, null); }
 
-<YYINITIAL> {PAR_DER}	    { return new Symbol(sym.PAR_DER, yyline, yycolumn, null); }
-<YYINITIAL> {PAR_DER}	    { return new Symbol(sym.PAR_DER, yyline, yycolumn, null); }
-<YYINITIAL> {PAR_DER}	    { return new Symbol(sym.PAR_DER, yyline, yycolumn, null); }
-<YYINITIAL> {PAR_DER}	    { return new Symbol(sym.PAR_DER, yyline, yycolumn, null); }
-<YYINITIAL> {PAR_DER}	    { return new Symbol(sym.PAR_DER, yyline, yycolumn, null); }
-<YYINITIAL> {PAR_DER}	    { return new Symbol(sym.PAR_DER, yyline, yycolumn, null); }
+<YYINITIAL> {REL_IGUAL}	    { return new Symbol(sym.REL_IGUAL, yyline, yycolumn, null); }
+<YYINITIAL> {REL_DIF}	    { return new Symbol(sym.REL_DIF, yyline, yycolumn, null); }
+<YYINITIAL> {REL_MAY}	    { return new Symbol(sym.REL_MAY, yyline, yycolumn, null); }
+<YYINITIAL> {REL_MEN}	    { return new Symbol(sym.REL_MEN, yyline, yycolumn, null); }
+<YYINITIAL> {REL_MAYI}	    { return new Symbol(sym.REL_MAYI, yyline, yycolumn, null); }
+<YYINITIAL> {REL_MENI}	    { return new Symbol(sym.REL_MENI, yyline, yycolumn, null); }
+
+<YYINITIAL> {LOG_AND}	    { return new Symbol(sym.LOG_AND, yyline, yycolumn, null); }
+<YYINITIAL> {LOG_OR}	    { return new Symbol(sym.LOG_OR, yyline, yycolumn, null); }
+<YYINITIAL> {LOG_NOT}	    { return new Symbol(sym.LOG_NOT, yyline, yycolumn, null); }
 
 
 
