@@ -82,6 +82,7 @@ public class Inicio extends javax.swing.JFrame {
             scanner scan = new scanner(new BufferedReader( new StringReader(texto)));
             parser parser = new parser(scan);
             parser.parse();
+            jTextArea_Codigo3Dgenerado.setText("");
             jTextArea_Codigo3Dgenerado.setText(ControlC3D.getC3D());
             System.out.println("Finaliza la generación de C3D...");
         } catch (Exception ex) {

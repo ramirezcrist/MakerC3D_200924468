@@ -38,75 +38,143 @@ start with inicial;
 inicial     ::= {: ControlC3D.reiniciar(); :} inicio:exp 
                     {: 
                         RESULT = exp;
-                        ControlC3D.agregarC3D("//Último valor: " + exp.getCad());
+                        ControlC3D.agregarC3D("//Etiquetas verdaderas: " + ControlC3D.getEtiquetasVerdaderas() +"\n Etiquetas falsas: "+ControlC3D.getEtiquetasFalsas());
                     :};
 inicio   ::= logico:log
             {:RESULT = log;:}
              ;
-logico      ::=  logico:izq LOG_AND logico:der
+logico      ::=  logico:izq LOG_AND {: ControlC3D.agregarC3D(izq.getEtiquetaVerdadera()+ ";\n");:} logico:der
                     {: 
-                        String temp = ControlC3D.generaTemp();
-                        String c3d = temp + " = " + izq.getCad() + " && " + der.getCad() + ";\n";
-                        ControlC3D.agregarC3D(c3d);
-                        RESULT = new NodoC3D(temp); 
+                       //SE CONCATENA LA CADENA QUE ESTA ESTATICA EN CONTROLC3D.GETC3D() Y SE AGREGA EL IF
+                        String c3d = "";
+                        NodoC3D nodo = new NodoC3D();
+                        ControlC3D.agregarC3D(c3d); //aqui se va concatenando la cadena general
+                        ControlC3D.eliminarEtiqueta(izq.getEtiquetaVerdadera(), 1);
+                        RESULT = nodo; 
                     :}
-                |logico:izq LOG_OR logico:der
-{: 
-                        String temp = ControlC3D.generaTemp();
-                        String c3d = temp + " = " + izq.getCad() + " || " + der.getCad() + ";\n";
-                        ControlC3D.agregarC3D(c3d);
-                        RESULT = new NodoC3D(temp); 
+                |logico:izq LOG_OR {: ControlC3D.agregarC3D(izq.getEtiquetaFalsa()+ ";\n"); :} logico:der
+                    {: 
+                       
+                        String c3d = "";
+                        NodoC3D nodo = new NodoC3D();
+                        ControlC3D.agregarC3D(c3d); //aqui se va concatenando la cadena general
+                       ControlC3D.eliminarEtiqueta(izq.getEtiquetaFalsa(), 0);
+                        RESULT = nodo; 
                     :}
                 | LOG_NOT logico:der
 {: 
-                        String temp = ControlC3D.generaTemp();
-                        String c3d = temp + " =  " + " ! " + der.getCad() + ";\n";
-                        ControlC3D.agregarC3D(c3d);
-                        RESULT = new NodoC3D(temp); 
+                      
                     :}
                 |relacional:rel {:RESULT = rel;:}
                 ;
 relacional  ::= expresion:izq REL_IGUAL expresion:der
                     {: 
-                        String temp = ControlC3D.generaTemp();
-                        String c3d = temp + " = " + izq.getCad() + " == " + der.getCad() + ";\n";
-                        ControlC3D.agregarC3D(c3d);
-                        RESULT = new NodoC3D(temp); 
+                       //SE GENERAN LAS ETIQUETAS DE FALSO Y VERDADERO
+                        String etiquetaV = ControlC3D.generarEtiqueta(); // L$
+                        String etiquetaF = ControlC3D.generarEtiqueta();//L+1
+
+                         //SE CONCATENA LA CADENA QUE ESTA ESTATICA EN CONTROLC3D.GETC3D() Y SE AGREGA EL IF
+                        String c3d = ControlC3D.generarIf(izq.getCad(), der.getCad(), "==", etiquetaV, etiquetaF)+ "\n";
+                        
+                        NodoC3D nodo = new NodoC3D();
+                        nodo.setEtiquetaVerdadera(etiquetaV);
+                        nodo.setEtiquetaFalsa(etiquetaF);
+                        ControlC3D.setEtiquetasVerdaderas(etiquetaV);
+                        ControlC3D.setEtiquetasFalsas(etiquetaF);
+                        ControlC3D.agregarC3D(c3d); //aqui se va concatenando la cadena general
+                        nodo.setTemporal(ControlC3D.getC3D());
+                        RESULT = nodo; 
+                   
                     :}
                 |expresion:izq REL_DIF expresion:der
 {: 
-                        String temp = ControlC3D.generaTemp();
-                        String c3d = temp + " = " + izq.getCad() + " != " + der.getCad() + ";\n";
-                        ControlC3D.agregarC3D(c3d);
-                        RESULT = new NodoC3D(temp); 
+                      //SE GENERAN LAS ETIQUETAS DE FALSO Y VERDADERO
+                        String etiquetaV = ControlC3D.generarEtiqueta(); // L$
+                        String etiquetaF = ControlC3D.generarEtiqueta();//L+1
+
+                         //SE CONCATENA LA CADENA QUE ESTA ESTATICA EN CONTROLC3D.GETC3D() Y SE AGREGA EL IF
+                        String c3d = ControlC3D.generarIf(izq.getCad(), der.getCad(), "!=", etiquetaV, etiquetaF)+ "\n";
+                        
+                        NodoC3D nodo = new NodoC3D();
+                        nodo.setEtiquetaVerdadera(etiquetaV);
+                        nodo.setEtiquetaFalsa(etiquetaF);
+                        ControlC3D.setEtiquetasVerdaderas(etiquetaV);
+                        ControlC3D.setEtiquetasFalsas(etiquetaF);
+                        ControlC3D.agregarC3D(c3d); //aqui se va concatenando la cadena general
+                        nodo.setTemporal(ControlC3D.getC3D());
+                        RESULT = nodo; 
                     :}
                 |expresion:izq REL_MAY expresion:der
 {: 
-                        String temp = ControlC3D.generaTemp();
-                        String c3d = temp + " = " + izq.getCad() + " > " + der.getCad() + ";\n";
-                        ControlC3D.agregarC3D(c3d);
-                        RESULT = new NodoC3D(temp); 
+                        //SE GENERAN LAS ETIQUETAS DE FALSO Y VERDADERO
+                        String etiquetaV = ControlC3D.generarEtiqueta(); // L$
+                        String etiquetaF = ControlC3D.generarEtiqueta();//L+1
+
+                         //SE CONCATENA LA CADENA QUE ESTA ESTATICA EN CONTROLC3D.GETC3D() Y SE AGREGA EL IF
+                        String c3d = ControlC3D.generarIf(izq.getCad(), der.getCad(), ">", etiquetaV, etiquetaF)+ "\n";
+                        
+                        NodoC3D nodo = new NodoC3D();
+                        nodo.setEtiquetaVerdadera(etiquetaV);
+                        nodo.setEtiquetaFalsa(etiquetaF);
+                        ControlC3D.setEtiquetasVerdaderas(etiquetaV);
+                        ControlC3D.setEtiquetasFalsas(etiquetaF);
+                        ControlC3D.agregarC3D(c3d); //aqui se va concatenando la cadena general
+                        nodo.setTemporal(ControlC3D.getC3D());
+                        RESULT = nodo; 
                     :}
                 |expresion:izq REL_MEN expresion:der
 {: 
-                        String temp = ControlC3D.generaTemp();
-                        String c3d = temp + " = " + izq.getCad() + " < " + der.getCad() + ";\n";
-                        ControlC3D.agregarC3D(c3d);
-                        RESULT = new NodoC3D(temp); 
+                         //SE GENERAN LAS ETIQUETAS DE FALSO Y VERDADERO
+                        String etiquetaV = ControlC3D.generarEtiqueta(); // L$
+                        String etiquetaF = ControlC3D.generarEtiqueta();//L+1
+
+                         //SE CONCATENA LA CADENA QUE ESTA ESTATICA EN CONTROLC3D.GETC3D() Y SE AGREGA EL IF
+                        String c3d = ControlC3D.generarIf(izq.getCad(), der.getCad(), "<=", etiquetaV, etiquetaF)+ "\n";
+                        
+                        NodoC3D nodo = new NodoC3D();
+                        nodo.setEtiquetaVerdadera(etiquetaV);
+                        nodo.setEtiquetaFalsa(etiquetaF);
+                        ControlC3D.setEtiquetasVerdaderas(etiquetaV);
+                        ControlC3D.setEtiquetasFalsas(etiquetaF);
+                        ControlC3D.agregarC3D(c3d); //aqui se va concatenando la cadena general
+                        nodo.setTemporal(ControlC3D.getC3D());
+                        RESULT = nodo; 
                     :}
                 |expresion:izq REL_MAYI expresion:der
 {: 
-                        String temp = ControlC3D.generaTemp();
-                        String c3d = temp + " = " + izq.getCad() + " >= " + der.getCad() + ";\n";
-                        ControlC3D.agregarC3D(c3d);
-                        RESULT = new NodoC3D(temp); 
+                       //SE GENERAN LAS ETIQUETAS DE FALSO Y VERDADERO
+                        String etiquetaV = ControlC3D.generarEtiqueta(); // L$
+                        String etiquetaF = ControlC3D.generarEtiqueta();//L+1
+
+                         //SE CONCATENA LA CADENA QUE ESTA ESTATICA EN CONTROLC3D.GETC3D() Y SE AGREGA EL IF
+                        String c3d = ControlC3D.generarIf(izq.getCad(), der.getCad(), ">=", etiquetaV, etiquetaF)+ "\n";
+                        
+                        NodoC3D nodo = new NodoC3D();
+                        nodo.setEtiquetaVerdadera(etiquetaV);
+                        nodo.setEtiquetaFalsa(etiquetaF);
+                        ControlC3D.setEtiquetasVerdaderas(etiquetaV);
+                        ControlC3D.setEtiquetasFalsas(etiquetaF);
+                        ControlC3D.agregarC3D(c3d); //aqui se va concatenando la cadena general
+                        nodo.setTemporal(ControlC3D.getC3D());
+                        RESULT = nodo; 
                     :}
                 |expresion:izq REL_MENI expresion:der
 {: 
-                        String temp = ControlC3D.generaTemp();
-                        String c3d = temp + " = " + izq.getCad() + " <= " + der.getCad() + ";\n";
-                        ControlC3D.agregarC3D(c3d);
-                        RESULT = new NodoC3D(temp); 
+                       //SE GENERAN LAS ETIQUETAS DE FALSO Y VERDADERO
+                        String etiquetaV = ControlC3D.generarEtiqueta(); // L$
+                        String etiquetaF = ControlC3D.generarEtiqueta();//L+1
+
+                         //SE CONCATENA LA CADENA QUE ESTA ESTATICA EN CONTROLC3D.GETC3D() Y SE AGREGA EL IF
+                        String c3d = ControlC3D.generarIf(izq.getCad(), der.getCad(), "<=", etiquetaV, etiquetaF)+ "\n";
+                        
+                        NodoC3D nodo = new NodoC3D();
+                        nodo.setEtiquetaVerdadera(etiquetaV);
+                        nodo.setEtiquetaFalsa(etiquetaF);
+                        ControlC3D.setEtiquetasVerdaderas(etiquetaV);
+                        ControlC3D.setEtiquetasFalsas(etiquetaF);
+                        ControlC3D.agregarC3D(c3d); //aqui se va concatenando la cadena general
+                        nodo.setTemporal(ControlC3D.getC3D());
+                        RESULT = nodo; 
                     :}
                 |expresion:exp {:RESULT = exp;:}
                 ;
@@ -114,50 +182,83 @@ expresion   ::= expresion:izq MAS expresion:der
                     {: 
                         String temp = ControlC3D.generaTemp();
                         String c3d = temp + " = " + izq.getCad() + " + " + der.getCad() + ";\n";
-                        ControlC3D.agregarC3D(c3d);
-                        RESULT = new NodoC3D(temp); 
+                        ControlC3D.agregarC3D(c3d);                    
+                        NodoC3D nodo = new NodoC3D();
+                        nodo.setCad(temp);
+                        
+                        RESULT = nodo;
                     :}
             |   expresion:izq MENOS expresion:der
                     {: 
                         String temp = ControlC3D.generaTemp();
                         String c3d = temp + " = " + izq.getCad() + " - " + der.getCad() + ";\n";
-                        ControlC3D.agregarC3D(c3d);
-                        RESULT = new NodoC3D(temp); 
+                        ControlC3D.agregarC3D(c3d);                    
+                        NodoC3D nodo = new NodoC3D();
+                        nodo.setCad(temp);
+
+                        RESULT = nodo;
                     :}
             |   expresion:izq MULT expresion:der
                     {: 
                         String temp = ControlC3D.generaTemp();
                         String c3d = temp + " = " + izq.getCad() + " * " + der.getCad() + ";\n";
-                        ControlC3D.agregarC3D(c3d);
-                        RESULT = new NodoC3D(temp); 
+                        ControlC3D.agregarC3D(c3d);                    
+                        NodoC3D nodo = new NodoC3D();
+                        nodo.setCad(temp);
+                        
+                        RESULT = nodo;
                     :}
             |   expresion:izq DIV expresion:der
                     {: 
                         String temp = ControlC3D.generaTemp();
                         String c3d = temp + " = " + izq.getCad() + " / " + der.getCad() + ";\n";
-                        ControlC3D.agregarC3D(c3d);
-                        RESULT = new NodoC3D(temp); 
+                        ControlC3D.agregarC3D(c3d);                    
+                        NodoC3D nodo = new NodoC3D();
+                        nodo.setCad(temp);
+
+                        RESULT = nodo; 
                     :}
             |   expresion:izq POT expresion:der
                     {: 
                         String temp = ControlC3D.generaTemp();
                         String c3d = temp + " = " + izq.getCad() + " ^ " + der.getCad() + ";\n";
-                        ControlC3D.agregarC3D(c3d);
-                        RESULT = new NodoC3D(temp); 
+                        ControlC3D.agregarC3D(c3d);                    
+                        NodoC3D nodo = new NodoC3D();
+                        nodo.setCad(temp);
+
+                        RESULT = nodo;
                     :}
             |   MENOS expresion:exp 
                     {: 
                         String temp = ControlC3D.generaTemp();
                         String c3d = temp + " = - " + exp.getCad() + ";\n";
                         ControlC3D.agregarC3D(c3d);
-                        RESULT = new NodoC3D(temp); 
+
+                        NodoC3D nodo = new NodoC3D();
+                        nodo.setCad(c3d);
+                        nodo.setTemporal(temp);
+                        RESULT = nodo; 
                     :}
             |   PAR_IZQ expresion:exp PAR_DER   
-                    {: RESULT = exp; :}
+                    {: 
+                        RESULT = exp; 
+                    :}
             |   ID:id           
-                    {: RESULT = new NodoC3D(id); :}
+                    {: 
+                        NodoC3D nodo = new NodoC3D();
+                        nodo.setCad(id);
+                        RESULT = nodo; 
+                    :}
             |   ENTERO:entero   
-                    {: RESULT = new NodoC3D(entero); :}
+                    {: 
+                        NodoC3D nodo = new NodoC3D();
+                        nodo.setCad(entero);
+                        RESULT = nodo;  
+                    :}
             |   DECIMAL:decimal 
-                    {: RESULT = new NodoC3D(decimal); :}
+                    {: 
+                        NodoC3D nodo = new NodoC3D();
+                        nodo.setCad(decimal);
+                        RESULT = nodo; 
+:}
             ;
